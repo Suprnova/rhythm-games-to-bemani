@@ -36,7 +36,7 @@ namespace osu_to_bemani_tool
         }
         public static string Selection()
         {
-            Console.WriteLine(" osu! to Bemani converter by @suprnova123 - Last built on July 9th, 2020");
+            Console.WriteLine(" osu! to Bemani converter by @suprnova123 - Last built on July 19th, 2020, v1.1");
             Console.WriteLine("\n Which Bemani games do you want to search for songs in?");
             Console.WriteLine(" 1. beatmania IIDX 27 \n 2. pop'n'music peace \n 3. DanceDanceRevolution A20 \n 4. GITADORA NEX+AGE \n 5. jubeat festo \n 6. REFLEC BEAT 悠久のリフレシア \n 7. Sound Voltex Vivid Wave \n 8. Nostalgia Op.3 \n 9. Dancerush Stardom \n 0. MUSECA");
             Console.WriteLine(" You can combine every game into one message by typing multiple numbers (i.e. 157 for beatmania, jubeat, and SDVX or 1234567890 for every game)");
