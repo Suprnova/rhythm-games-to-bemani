@@ -8,6 +8,6 @@ Type a combination of numbers to select each game that you want to search for ga
 ![Directory Tutorial Image](https://cdn.discordapp.com/attachments/586043175391592556/734489531499151421/unknown.png)
 
 
-Copy and paste your osu! Songs directory into the console and press Enter. (You can get more help finding your directory with [this link](https://osu.ppy.sh/help/wiki/osu!_Program_Files). Your folder is typically in C:\Users\\(Username)\AppData\Local\osu!\Songs.
+Copy and paste your osu! Songs directory into the console and press Enter. (You can get more help finding your directory with [this link](https://osu.ppy.sh/help/wiki/osu!_Program_Files). Your folder is typically in C:\Users\\(Username)\AppData\Local\osu!\Songs.)
 
 Afterwards, you will receive a list of songs that were found in each of the games you selected. Copy this information and use it as reference when you need to. (For example, adding songs to your favourite from the eAmusement website or with the proprietary modular arcade server that is used at your local arcade.)
