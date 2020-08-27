@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows.Forms;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -36,10 +37,10 @@ namespace osu_to_bemani_tool
         }
         public static string Selection()
         {
-            Console.WriteLine(" osu! to Bemani converter by @suprnova123 - Last built on July 19th, 2020, v1.1");
+            Console.WriteLine(" osu! to Bemani converter v by @suprnova123 - Last built on August 26th, 2020");
             Console.WriteLine("\n Which Bemani games do you want to search for songs in?");
             Console.WriteLine(" 1. beatmania IIDX 27 \n 2. pop'n'music peace \n 3. DanceDanceRevolution A20 \n 4. GITADORA NEX+AGE \n 5. jubeat festo \n 6. REFLEC BEAT 悠久のリフレシア \n 7. Sound Voltex Vivid Wave \n 8. Nostalgia Op.3 \n 9. Dancerush Stardom \n 0. MUSECA");
-            Console.WriteLine(" You can combine every game into one message by typing multiple numbers (i.e. 157 for beatmania, jubeat, and SDVX or 1234567890 for every game)");
+            Console.WriteLine(" You can combine every game into one message by typing multiple numbers \n (i.e. 157 for beatmania, jubeat, and SDVX or 1234567890 for every game)");
 			Console.Write(" Please make your selection: ");
             string selection = Console.ReadLine().Trim();
             if (selection.Length <= 0)
@@ -57,9 +58,35 @@ namespace osu_to_bemani_tool
             }
             return selection;
         }
+        public static bool FileOption()
+        {
+            Console.Write(" Do you want to save your results to a file? (y) (n): ");
+            string selectionFile = Console.ReadLine().Trim();
+            if (selectionFile.Length <= 0)
+            {
+                Console.WriteLine(" Error: This is not a yes or no answer.");
+                return FileOption();
+            }
+            if (selectionFile.Contains("y") && selectionFile.Contains("n"))
+            {
+                Console.WriteLine(" You cannot select both yes and no.");
+                return FileOption();
+            }
+            if (selectionFile.Contains("y"))
+            {
+                bool useFile = true;
+                return useFile;
+            }
+            else
+            {
+                bool useFile = false;
+                return useFile;
+            }
+        }
         static void Main(string[] args)
         {
             string input = Selection();
+            bool filebool = FileOption();
             string IIDXPage = "empty";
             string IIDXPage2 = "empty";
             string pmPage = "empty";
@@ -79,7 +106,7 @@ namespace osu_to_bemani_tool
             string nostalgiaPage2 = "empty";
             string DRSDPage = "empty";
             string MUSECAPage = "empty";
-			Console.WriteLine(" Please note that, depending on your location, this proces might take a while. \n This is because the song lists used are from bemaniwiki.com, which is a website hosted in Japan that is pretty slow to begin with");
+			Console.WriteLine(" Please note that, depending on your location, this proces might take a while. \n This is because the song lists used are from bemaniwiki.com, \n which is a website hosted in Japan that is pretty slow to begin with");
             if (input.Contains("1"))
             {
                 Console.WriteLine(" Requesting beatmania IIDX song lists...");
@@ -528,7 +555,7 @@ namespace osu_to_bemani_tool
                 }
                 
             }
-            Console.WriteLine("\n Here is every osu! song you have that matches the name of a song from the Bemani wiki. This might not necessarily mean that the songs are the same, as they might share the same name but be different songs.");
+            Console.WriteLine("\n Here is every osu! song you have that matches the name of a song from the Bemani wiki. \n This might not necessarily mean that the songs are the same, as they might share the same name but be different songs.");
             var distinctmatchesIIDX = matchesIIDX.Distinct().ToArray();
             var distinctmatchesPM = matchesPM.Distinct().ToArray();
             var distinctmatchesDDR = matchesDDR.Distinct().ToArray();
@@ -539,9 +566,55 @@ namespace osu_to_bemani_tool
             var distinctmatchesnostalgia = matchesnostalgia.Distinct().ToArray();
             var distinctmatchesDRSD = matchesDRSD.Distinct().ToArray();
             var distinctmatchesMUSECA = matchesMUSECA.Distinct().ToArray();
+            string applicationPath = Path.GetDirectoryName(Application.ExecutablePath);
+            string textFilePath = Path.Combine(applicationPath, "matches.txt");
+            if (filebool == true)
+            {
+                try
+                {
+                    File.Create("matches.txt").Dispose();
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    Console.WriteLine(" I don't have permission to create a file! Move this executable somewhere else.");
+                    filebool = false;
+                }
+                catch (PathTooLongException)
+                {
+                    Console.WriteLine(" I can't create a file here. Move this executable somewhere with a shorter directory name.");
+                    filebool = false;
+                }
+                catch (IOException)
+                {
+                    File.Delete(textFilePath);
+                    try
+                    {
+                        File.Create("matches.txt").Dispose();
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        Console.WriteLine(" I don't have permission to create a file! Move this executable somewhere else.");
+                        filebool = false;
+                    }
+                    catch (PathTooLongException)
+                    {
+                        Console.WriteLine(" I can't create a file here. Move this executable somewhere with a shorter directory name.");
+                        filebool = false;
+                    }
+                    catch
+                    {
+                        Console.WriteLine(" Error creating file.");
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine(" Error creating file.");
+                }
+            }
             if (input.Contains("1"))
             {
-                Console.WriteLine("\n IIDX:");
+                Console.WriteLine("\n beatmania IIDX:");
+                File.AppendAllText(textFilePath, "beatmania IIDX:" + Environment.NewLine);
                 foreach (var match in distinctmatchesIIDX)
                 {
                     if (match == null)
@@ -550,13 +623,21 @@ namespace osu_to_bemani_tool
                     }
                     else
                     {
-                        Console.WriteLine(match.ToString());
+                        Console.WriteLine(" " + match.ToString());
+                        if (filebool == true)
+                        {
+                            File.AppendAllText(textFilePath, match.ToString() + Environment.NewLine);
+                        }
                     }
                 }
             }
             if (input.Contains("2"))
             {
                 Console.WriteLine("\n pop'n'music:");
+                if (filebool == true)
+                {
+                    File.AppendAllText(textFilePath, "pop'n'music:" + Environment.NewLine);
+                }
                 foreach (var match in distinctmatchesPM)
                 {
                     if (match == null)
@@ -565,13 +646,21 @@ namespace osu_to_bemani_tool
                     }
                     else
                     {
-                        Console.WriteLine(match.ToString());
+                        Console.WriteLine(" " + match.ToString());
+                        if (filebool == true)
+                        {
+                            File.AppendAllText(textFilePath, match.ToString() + Environment.NewLine);
+                        }
                     }
                 }
             }
             if (input.Contains("3"))
             {
                 Console.WriteLine("\n Dance Dance Revolution:");
+                if (filebool == true)
+                {
+                    File.AppendAllText(textFilePath, "Dance Dance Revolution:" + Environment.NewLine);
+                }
                 foreach (var match in distinctmatchesDDR)
                 {
                     if (match == null)
@@ -580,13 +669,21 @@ namespace osu_to_bemani_tool
                     }
                     else
                     {
-                        Console.WriteLine(match.ToString());
+                        Console.WriteLine(" " + match.ToString());
+                        if (filebool == true)
+                        {
+                            File.AppendAllText(textFilePath, match.ToString() + Environment.NewLine);
+                        }
                     }
                 }
             }
             if (input.Contains("4"))
             {
                 Console.WriteLine("\n Gitadora:");
+                    if (filebool == true)
+                    {
+                        File.AppendAllText(textFilePath, "Gitadora:" + Environment.NewLine);
+                    }
                 foreach (var match in distinctmatchesGD)
                 {
                     if (match == null)
@@ -595,13 +692,21 @@ namespace osu_to_bemani_tool
                     }
                     else
                     {
-                        Console.WriteLine(match.ToString());
+                        Console.WriteLine(" " + match.ToString());
+                        if (filebool == true)
+                        {
+                            File.AppendAllText(textFilePath, match.ToString() + Environment.NewLine);
+                        }
                     }
                 }
             }
             if (input.Contains("5"))
             {
                 Console.WriteLine("\n jubeat:");
+                if (filebool == true)
+                {
+                    File.AppendAllText(textFilePath, "jubeat:" + Environment.NewLine);
+                }
                 foreach (var match in distinctmatchesjubeat)
                 {
                     if (match == null)
@@ -610,13 +715,21 @@ namespace osu_to_bemani_tool
                     }
                     else
                     {
-                        Console.WriteLine(match.ToString());
+                        Console.WriteLine(" " + match.ToString());
+                        if (filebool == true)
+                        {
+                            File.AppendAllText(textFilePath, match.ToString() + Environment.NewLine);
+                        }
                     }
                 }
             }
             if (input.Contains("6"))
             {
                 Console.WriteLine("\n Reflec Beat:");
+                if (filebool == true)
+                {
+                    File.AppendAllText(textFilePath, "Reflec Beat:" + Environment.NewLine);
+                }
                 foreach (var match in distinctmatchesreflect)
                 {
                     if (match == null)
@@ -625,13 +738,21 @@ namespace osu_to_bemani_tool
                     }
                     else
                     {
-                        Console.WriteLine(match.ToString());
+                        Console.WriteLine(" " + match.ToString());
+                        if (filebool == true)
+                        {
+                            File.AppendAllText(textFilePath, match.ToString() + Environment.NewLine);
+                        }
                     }
                 }
             }
             if (input.Contains("7"))
             {
                 Console.WriteLine("\n Sound Voltex:");
+                if (filebool == true)
+                {
+                    File.AppendAllText(textFilePath, "Sound Voltex:" + Environment.NewLine);
+                }
                 foreach (var match in distinctmatchesSDVX)
                 {
                     if (match == null)
@@ -640,13 +761,21 @@ namespace osu_to_bemani_tool
                     }
                     else
                     {
-                        Console.WriteLine(match.ToString());
+                        Console.WriteLine(" " + match.ToString());
+                        if (filebool == true)
+                        {
+                            File.AppendAllText(textFilePath, match.ToString() + Environment.NewLine);
+                        }
                     }
                 }
             }
             if (input.Contains("8"))
             {
                 Console.WriteLine("\n Nostalgia:");
+                if (filebool == true)
+                {
+                    File.AppendAllText(textFilePath, "Nostalgia:" + Environment.NewLine);
+                }
                 foreach (var match in distinctmatchesnostalgia)
                 {
                     if (match == null)
@@ -655,13 +784,21 @@ namespace osu_to_bemani_tool
                     }
                     else
                     {
-                        Console.WriteLine(match.ToString());
+                        Console.WriteLine(" " + match.ToString());
+                        if (filebool == true)
+                        {
+                            File.AppendAllText(textFilePath, match.ToString() + Environment.NewLine);
+                        }
                     }
                 }
             }
             if (input.Contains("9"))
             {
                 Console.WriteLine("\n Dancerush Stardom:");
+                if (filebool == true)
+                {
+                    File.AppendAllText(textFilePath, "Dancerush Stardom:" + Environment.NewLine);
+                }
                 foreach (var match in distinctmatchesDRSD)
                 {
                     if (match == null)
@@ -670,14 +807,22 @@ namespace osu_to_bemani_tool
                     }
                     else
                     {
-                        Console.WriteLine(match.ToString());
+                        Console.WriteLine(" " + match.ToString());
+                        if (filebool == true)
+                        {
+                            File.AppendAllText(textFilePath, match.ToString() + Environment.NewLine);
+                        }
                     }
                 }
             }
             if (input.Contains("0"))
             {
                 Console.WriteLine("\n MUSECA:");
-                foreach (var match in distinctmatchesMUSECA)
+                if (filebool == true)
+                {
+                    File.AppendAllText(textFilePath, "MUSECA:" + Environment.NewLine);
+                }
+                    foreach (var match in distinctmatchesMUSECA)
                 {
                     if (match == null)
                     {
@@ -685,12 +830,22 @@ namespace osu_to_bemani_tool
                     }
                     else
                     {
-                        Console.WriteLine(match.ToString());
+                        Console.WriteLine(" " + match.ToString());
+                        if (filebool == true)
+                        {
+                            File.AppendAllText(textFilePath, match.ToString() + Environment.NewLine);
+                        }
                     }
                 }
             }
-
-            Console.WriteLine("\n Make sure to copy this information somewhere safe so that you can refer to it later.");
+            if (filebool == true)
+            {
+                Console.WriteLine("\n File containing all of this information saved to " + textFilePath);
+            }
+            else
+            {
+                Console.WriteLine("\n Make sure to copy this information somewhere safe so that you can refer to it later.");
+            }
             Console.WriteLine(" Press Enter when you're finished to close this window.");
             Console.ReadLine();
 
