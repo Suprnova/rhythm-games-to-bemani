@@ -1,5 +1,9 @@
-# osu! to BEMANI converter
-Console based application that will search through your osu! songs folder to find songs that also appear in popular BEMANI games. It uses the user provided osu! songs directory and compares it to [BEMANIWiki](http://bemaniwiki.com/).
+# Rhythm Games to BEMANI converter
+Console based application that will search through your rhythm game song folders to find songs that also appear in popular BEMANI games. It uses the user provided songs directory and compares it to [BEMANIWiki](http://bemaniwiki.com/).
+
+# Supported Games:
+* osu!
+* Stepmania
 
 # Usage:
 ![Selection Tutorial Image](https://cdn.discordapp.com/attachments/586043175391592556/734488862864441425/unknown.png)
