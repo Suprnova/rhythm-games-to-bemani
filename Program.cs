@@ -18,7 +18,7 @@ namespace rhythm_games_to_bemani
         public static string AskGame()
         {
             Console.WriteLine(" Which game do you want to search through?");
-            Console.WriteLine(" 1. osu!, 2. Stepmania 3. Clone Hero");
+            Console.WriteLine(" 1. osu!\n 2. Stepmania\n 3. Clone Hero");
             Console.Write(" ");
             string gameSelection = Console.ReadLine();
             if (gameSelection.Length >= 2)
