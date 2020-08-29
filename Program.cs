@@ -15,21 +15,21 @@ namespace rhythm_games_to_bemani
 {
     public class Program
     {
-        public static string AskGame()
+        public static string AskSource()
         {
-            Console.WriteLine(" Which game do you want to search through?");
+            Console.WriteLine(" Which game do you want to search through for BEMANI songs?");
             Console.WriteLine(" 1. osu!\n 2. Stepmania\n 3. Clone Hero");
             Console.Write(" ");
             string gameSelection = Console.ReadLine();
             if (gameSelection.Length >= 2)
             {
                 Console.WriteLine(" Error: Only type one option.");
-                return AskGame();
+                return AskSource();
             }
             else if (!gameSelection.Contains("1") && !gameSelection.Contains("2") && !gameSelection.Contains("3"))
             {
                 Console.WriteLine(" Error: You didn't select an option.");
-                return AskGame();
+                return AskSource();
             }
             else if (gameSelection.Contains("1"))
             {
@@ -52,7 +52,7 @@ namespace rhythm_games_to_bemani
         }
         public static string AskDirectory()
         {
-            string gameDir = AskGame();
+            string gameDir = AskSource();
             if (gameDir == "1")
             {
                 string osuDirectory = OsuDirectory();
@@ -399,16 +399,16 @@ namespace rhythm_games_to_bemani
             string DRSDPageUpper = DRSDPage.ToUpper();;
             string MUSECAPageUpper = MUSECAPage.ToUpper();;
             int i = 0;
-            string[] matchesIIDX = new string[1600];
-            string[] matchesPM = new string[1600];
-            string[] matchesDDR = new string[1600];
-            string[] matchesGD = new string[1600];
-            string[] matchesjubeat = new string[1600];
-            string[] matchesreflect = new string[1600];
-            string[] matchesSDVX = new string[1600];
-            string[] matchesnostalgia = new string[1600];
-            string[] matchesDRSD = new string[1600];
-            string[] matchesMUSECA = new string[1600];
+            string[] matchesIIDX = new string[100000];
+            string[] matchesPM = new string[100000];
+            string[] matchesDDR = new string[100000];
+            string[] matchesGD = new string[100000];
+            string[] matchesjubeat = new string[100000];
+            string[] matchesreflect = new string[100000];
+            string[] matchesSDVX = new string[100000];
+            string[] matchesnostalgia = new string[100000];
+            string[] matchesDRSD = new string[100000];
+            string[] matchesMUSECA = new string[100000];
             string directory = AskDirectory();
             Console.WriteLine(" Searching Bemaniwiki...");
             string[] files = Directory.GetFiles(directory, "*.osu", SearchOption.AllDirectories);
