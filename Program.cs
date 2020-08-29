@@ -18,17 +18,17 @@ namespace rhythm_games_to_bemani
         public static string AskGame()
         {
             Console.WriteLine(" Which game do you want to search through?");
-            Console.WriteLine(" 1. osu!, 2. Stepmania");
+            Console.WriteLine(" 1. osu!, 2. Stepmania 3. Clone Hero");
             Console.Write(" ");
             string gameSelection = Console.ReadLine();
-            if (gameSelection.Contains("1") && gameSelection.Contains("2"))
+            if (gameSelection.Length >= 2)
             {
-                Console.WriteLine(" Error: You cannot select both games");
+                Console.WriteLine(" Error: Only type one option.");
                 return AskGame();
             }
-            else if (!gameSelection.Contains("1") && !gameSelection.Contains("2"))
+            else if (!gameSelection.Contains("1") && !gameSelection.Contains("2") && !gameSelection.Contains("3"))
             {
-                Console.WriteLine(" Error: You didn't select 1 or 2.");
+                Console.WriteLine(" Error: You didn't select an option.");
                 return AskGame();
             }
             else if (gameSelection.Contains("1"))
@@ -37,26 +37,37 @@ namespace rhythm_games_to_bemani
                 string game = "1";
                 return game;
             }
-            else
+            else if (gameSelection.Contains("2"))
             {
                 Console.WriteLine(" Searching for Stepmania songs...");
                 string game = "2";
                 return game;
             }
+            else
+            {
+                Console.WriteLine(" Searching for Clone Hero songs...");
+                string game = "3";
+                return game;
+            }
         }
         public static string AskDirectory()
         {
-            if (AskGame() == "1")
+            string gameDir = AskGame();
+            if (gameDir == "1")
             {
                 string osuDirectory = OsuDirectory();
                 return osuDirectory;
             }
-            else
+            else if (gameDir == "2")
             {
                 string stepmaniaDirectory = StepmaniaDirectory();
                 return stepmaniaDirectory;
             }
-            
+            else
+            {
+                string cloneHeroDirectory = CloneHeroDirectory();
+                return cloneHeroDirectory;
+            }          
         }
         public static string OsuDirectory()
         {
@@ -96,6 +107,26 @@ namespace rhythm_games_to_bemani
             {
                 Console.WriteLine(" Error: That is not a valid directory.");
                 return StepmaniaDirectory();
+            }
+        }
+        public static string CloneHeroDirectory()
+        {
+            Console.Write(" Enter the directory of your Clone Hero songs folder: ");
+            string cloneHeroSongDirectory = Console.ReadLine();
+            if (File.Exists(cloneHeroSongDirectory))
+            {
+                Console.WriteLine(" Error: That directory is a file, not a folder.");
+                return CloneHeroDirectory();
+            }
+            else if (Directory.Exists(cloneHeroSongDirectory))
+            {
+                Console.WriteLine(" Using the specified directory: " + cloneHeroSongDirectory);
+                return cloneHeroSongDirectory;
+            }
+            else
+            {
+                Console.WriteLine(" Error: That is not a valid directory.");
+                return CloneHeroDirectory();
             }
         }
         public static string Selection()
@@ -173,7 +204,8 @@ namespace rhythm_games_to_bemani
             string nostalgiaPage2 = "empty";
             string DRSDPage = "empty";
             string MUSECAPage = "empty";
-			Console.WriteLine(" Please note that, depending on your location, this proces might take a while. \n This is because the song lists used are from bemaniwiki.com, \n which is a website hosted in Japan that is pretty slow to begin with");
+			Console.WriteLine(" Please note that, depending on your location, this process might take a while. \n This is because the song lists used are from bemaniwiki.com, \n which is a website hosted in Japan that is pretty slow to begin with");
+            // what is a switch statement
             if (input.Contains("1"))
             {
                 Console.WriteLine(" Requesting beatmania IIDX song lists...");
@@ -378,372 +410,287 @@ namespace rhythm_games_to_bemani
             string[] matchesDRSD = new string[1600];
             string[] matchesMUSECA = new string[1600];
             string directory = AskDirectory();
-            string[] folders = Directory.GetDirectories(directory);
             Console.WriteLine(" Searching Bemaniwiki...");
-            char[] parenthesis = { '（', '(' };
-            DirectoryInfo directoryInfo = new DirectoryInfo(directory);
-            string directoryParent = directoryInfo.Parent.ToString();
-            if (directoryParent == "StepMania 5")
+            string[] files = Directory.GetFiles(directory, "*.osu", SearchOption.AllDirectories);
+            if (files.Length == 0)
             {
-                // assumes directory is full of packs
-                foreach (string pack in folders)
+                files = Directory.GetFiles(directory, "*.sm", SearchOption.AllDirectories);
+                if (files.Length == 0)
                 {
-                    string[] packFolders = Directory.GetDirectories(pack);
-                    foreach (string song in packFolders) //for each song in each pack folder
+                    files = Directory.GetFiles(directory, "*.ini", SearchOption.AllDirectories);
+                    if (files.Length == 0)
                     {
-                        string[] files = Directory.GetFiles(song, "*.sm");
-                        string firstFile = files.FirstOrDefault();
-                        if (firstFile == null)
-                        {
-                            break;
-                        }
-                        firstFile = firstFile.Replace("\\", "\\\\");
-                        string line = null;
-                        using (StreamReader sr2 = new StreamReader(firstFile))
-                        {
-                            line = sr2.ReadToEnd();
-                        }
-                        int index = line.ToUpper().IndexOf(";");
-                        string songTitleFinal = line.Substring(7, index - 7);
-                        string songBracket = ">" + songTitleFinal.ToUpper() + "<";
-                        if (input.Contains("1"))
-                        {
-                            if (IIDXPageUpper.Contains(songBracket) || IIDXPageUpper2.Contains(songBracket))
-                            {
-                                matchesIIDX[i] = songTitleFinal;
-                                i++;
-                            }
-                        }
-                        if (input.Contains("2"))
-                        {
-                            if (pmPageUpper.Contains(songBracket) || pmPageUpper2.Contains(songBracket))
-                            {
-                                matchesPM[i] = songTitleFinal;
-                                i++;
-                            }
-                        }
-                        if (input.Contains("3"))
-                        {
-                            if (DDRPageUpper.Contains(songBracket) || DDRPageUpper2.Contains(songBracket))
-                            {
-                                matchesDDR[i] = songTitleFinal;
-                                i++;
-                            }
-                        }
-                        if (input.Contains("4"))
-                        {
-                            if (GDPageUpper.Contains(songBracket) || GDPageUpper2.Contains(songBracket) || (GDPageUpper3.Contains(songBracket)))
-                            {
-                                matchesGD[i] = songTitleFinal;
-                                i++;
-                            }
-                        }
-                        if (input.Contains("5"))
-                        {
-                            if (jubeatPageUpper.Contains(songBracket) || jubeatPageUpper2.Contains(songBracket))
-                            {
-                                matchesjubeat[i] = songTitleFinal;
-                                i++;
-                            }
-                        }
-                        if (input.Contains("6"))
-                        {
-                            if (reflectPageUpper.Contains(songBracket) || reflectPageUpper2.Contains(songBracket))
-                            {
-                                matchesreflect[i] = songTitleFinal;
-                                i++;
-                            }
-                        }
-                        if (input.Contains("7"))
-                        {
-                            if (SDVXPageUpper.Contains(songBracket) || SDVXPageUpper2.Contains(songBracket))
-                            {
-                                matchesSDVX[i] = songTitleFinal;
-                                i++;
-                            }
-                        }
-                        if (input.Contains("8"))
-                        {
-                            if (nostalgiaPageUpper.Contains(songBracket) || nostalgiaPageUpper2.Contains(songBracket))
-                            {
-                                matchesnostalgia[i] = songTitleFinal;
-                                i++;
-                            }
-                        }
-                        if (input.Contains("9"))
-                        {
-                            if (DRSDPageUpper.Contains(songBracket))
-                            {
-                                matchesDRSD[i] = songTitleFinal;
-                                i++;
-                            }
-                        }
-                        if (input.Contains("0"))
-                        {
-                            if (MUSECAPageUpper.Contains(songBracket))
-                            {
-                                matchesMUSECA[i] = songTitleFinal;
-                                i++;
-                            }
-                        }                       
-                    }                   
+                        Console.WriteLine(" Error: No files found!");
+                        Console.WriteLine(" Press Enter to exit this window.");
+                    }
                 }
             }
-            else
+            string[] matched = new string[100000];
+            foreach (string file in files)
             {
-                foreach (string song in folders)
+                string result = String.Empty;
+                string resultUni = String.Empty;
+                string path = file.Replace("\\", "\\\\");
+                if (file.Contains(".osu")) // osu
                 {
-                    if (song != null)
+                    result = string.Empty;
+                    resultUni = string.Empty;
+                    var lines = File.ReadAllLines(path);
+                    foreach (var line in lines)
                     {
-                        string songShort = null;
-                        string songShortTemp = song.Substring(song.IndexOf(" - ") + 3).Trim();
-                        string songShortTemp3 = songShortTemp.Substring(songShortTemp.IndexOf(" (") + 1);
-                        string songShortTemp2 = "empty";
-                        if (songShortTemp3.Length == songShortTemp.Length)
+                        if (line.Contains("Title:")) // title saved
                         {
-                            songShortTemp2 = songShortTemp3.Substring(songShortTemp3.IndexOfAny(parenthesis) + 1);
-                        }
-                        else
-                        {
-                            songShortTemp2 = songShortTemp3;
-                        }
-
-                        if (songShortTemp.Length != songShortTemp2.Length)
-                        {
-                            songShort = songShortTemp.Remove((songShortTemp.Length - songShortTemp2.Length)).Trim();
-                        }
-                        else
-                        {
-                            songShort = songShortTemp;
-                        }
-                        string[] files = Directory.GetFiles(song, "*.osu");
-                        string chungus = files.FirstOrDefault();
-                        if (chungus == null)
-                        {
-                            break;
-                        }
-                        chungus = chungus.Replace("\\", "\\\\");
-                        string line = null;
-                        bool containsUnicode = false;
-                        const string TitleUnicode = "TitleUnicode:";
-                        using (StreamReader sr3 = new StreamReader(chungus))
-                        {
-                            line = sr3.ReadToEnd();
-                            containsUnicode = line.Contains(TitleUnicode);
-                        }
-                        string unicodeFinal = null;
-                        if (containsUnicode == true)
-                        {
-                            string unicodeSong = line.Substring(line.IndexOf(TitleUnicode));
-                            string unicodeSongTrimmed = unicodeSong.Substring(0, unicodeSong.IndexOf("Artist")).Trim();
-                            string unicodeSongTrimmed4 = unicodeSongTrimmed.Substring(unicodeSongTrimmed.IndexOf(" (") + 1);
-                            string unicodeSongTrimmed2 = "empty";
-                            if (unicodeSongTrimmed4.Length == unicodeSongTrimmed.Length)
+                            var text = line.Replace("Title:", "");
+                            var text2 = text;
+                            if (text.Contains("(TV Size)"))
                             {
-                                unicodeSongTrimmed2 = unicodeSongTrimmed4.Substring(unicodeSongTrimmed.IndexOfAny(parenthesis) + 1).Trim();
+                                text2 = text.Replace("(TV Size)", "");
                             }
-                            else
+                            result = text2.Trim();
+                            if (matched.Contains(result))
                             {
-                                unicodeSongTrimmed2 = unicodeSongTrimmed4;
-                            }
-                            string unicodeSongTrimmed3 = "empty";
-                            if (unicodeSongTrimmed.Length != unicodeSongTrimmed2.Length)
-                            {
-                                unicodeSongTrimmed3 = unicodeSongTrimmed.Remove((unicodeSongTrimmed.Length - unicodeSongTrimmed2.Length - 1)).Trim();
-                            }
-                            else
-                            {
-                                unicodeSongTrimmed3 = unicodeSongTrimmed2;
-                            }
-                            unicodeFinal = unicodeSongTrimmed3.Remove(0, TitleUnicode.Length).Trim();
-                            containsUnicode = (unicodeFinal.Length > 0);
-                        }
-                        if ((string.IsNullOrWhiteSpace(songShort) == false) || (string.IsNullOrWhiteSpace(unicodeFinal) == false))
-                        {
-                            string songBracket = ">" + songShort + "<";
-                            string songBracketUnicode = ">" + unicodeFinal + "<";
-                            string songBracketUpper = songBracket.ToUpper();
-                            string songBracketUnicodeUpper = songBracketUnicode.ToUpper();
-                            if (input.Contains("1"))
-                            {
-                                if (IIDXPageUpper.Contains(songBracketUpper) || IIDXPageUpper2.Contains(songBracketUpper))
-                                {
-                                    matchesIIDX[i] = songShort;
-                                    i++;
-                                }
-                                else if (containsUnicode == true)
-                                {
-                                    if (IIDXPageUpper.Contains(songBracketUnicodeUpper) || IIDXPageUpper2.Contains(songBracketUnicodeUpper))
-                                    {
-                                        matchesIIDX[i] = unicodeFinal;
-                                        i++;
-                                    }
-                                }
-                            }
-                            if (input.Contains("2"))
-                            {
-                                if (pmPageUpper.Contains(songBracketUpper) || pmPageUpper2.Contains(songBracketUpper))
-                                {
-                                    matchesPM[i] = songShort;
-                                    i++;
-                                }
-                                else if (containsUnicode == true)
-                                {
-                                    if (pmPageUpper.Contains(songBracketUnicodeUpper) || pmPageUpper2.Contains(songBracketUnicodeUpper))
-                                    {
-                                        matchesPM[i] = unicodeFinal;
-                                        i++;
-                                    }
-                                }
-                            }
-                            if (input.Contains("3"))
-                            {
-                                if (DDRPageUpper.Contains(songBracketUpper) || DDRPageUpper2.Contains(songBracketUpper))
-                                {
-                                    matchesDDR[i] = songShort;
-                                    i++;
-                                }
-                                else if (containsUnicode == true)
-                                {
-                                    if (DDRPageUpper.Contains(songBracketUnicodeUpper) || DDRPageUpper2.Contains(songBracketUnicodeUpper))
-                                    {
-                                        matchesDDR[i] = unicodeFinal;
-                                        i++;
-                                    }
-                                }
-                            }
-                            if (input.Contains("4"))
-                            {
-                                if (GDPageUpper.Contains(songBracketUpper) || GDPageUpper2.Contains(songBracketUpper) || (GDPageUpper3.Contains(songBracketUpper)))
-                                {
-                                    matchesGD[i] = songShort;
-                                    i++;
-                                }
-                                else if (containsUnicode == true)
-                                {
-                                    if (GDPageUpper.Contains(songBracketUnicodeUpper) || GDPageUpper2.Contains(songBracketUnicodeUpper) || (GDPageUpper3.Contains(songBracketUpper)))
-                                    {
-                                        matchesGD[i] = unicodeFinal;
-                                        i++;
-                                    }
-                                }
-                            }
-                            if (input.Contains("5"))
-                            {
-                                if (jubeatPageUpper.Contains(songBracketUpper) || jubeatPageUpper2.Contains(songBracketUpper))
-                                {
-                                    matchesjubeat[i] = songShort;
-                                    i++;
-                                }
-                                else if (containsUnicode == true)
-                                {
-                                    if (jubeatPageUpper.Contains(songBracketUnicodeUpper) || jubeatPageUpper2.Contains(songBracketUnicodeUpper))
-                                    {
-                                        matchesjubeat[i] = unicodeFinal;
-                                        i++;
-                                    }
-                                }
-                            }
-                            if (input.Contains("6"))
-                            {
-                                if (reflectPageUpper.Contains(songBracketUpper) || reflectPageUpper2.Contains(songBracketUpper))
-                                {
-                                    matchesreflect[i] = songShort;
-                                    i++;
-                                }
-                                else if (containsUnicode == true)
-                                {
-                                    if (reflectPageUpper.Contains(songBracketUnicodeUpper) || reflectPageUpper2.Contains(songBracketUnicodeUpper))
-                                    {
-                                        matchesreflect[i] = unicodeFinal;
-                                        i++;
-                                    }
-                                }
-                            }
-                            if (input.Contains("7"))
-                            {
-                                if (SDVXPageUpper.Contains(songBracketUpper) || SDVXPageUpper2.Contains(songBracketUpper))
-                                {
-                                    matchesSDVX[i] = songShort;
-                                    i++;
-                                }
-                                else if (containsUnicode == true)
-                                {
-                                    if (SDVXPageUpper.Contains(songBracketUnicodeUpper) || SDVXPageUpper2.Contains(songBracketUnicodeUpper))
-                                    {
-                                        matchesSDVX[i] = unicodeFinal;
-                                        i++;
-                                    }
-                                }
-                            }
-                            if (input.Contains("8"))
-                            {
-                                if (nostalgiaPageUpper.Contains(songBracketUpper) || nostalgiaPageUpper2.Contains(songBracketUpper))
-                                {
-                                    matchesnostalgia[i] = songShort;
-                                    i++;
-                                }
-                                else if (containsUnicode == true)
-                                {
-                                    if (nostalgiaPageUpper.Contains(songBracketUnicodeUpper) || nostalgiaPageUpper2.Contains(songBracketUnicodeUpper))
-                                    {
-                                        matchesnostalgia[i] = unicodeFinal;
-                                        i++;
-                                    }
-                                }
-                            }
-                            if (input.Contains("9"))
-                            {
-                                if (DRSDPageUpper.Contains(songBracketUpper))
-                                {
-                                    matchesDRSD[i] = songShort;
-                                    i++;
-                                }
-                                else if (containsUnicode == true)
-                                {
-                                    if (DRSDPageUpper.Contains(songBracketUnicodeUpper))
-                                    {
-                                        matchesDRSD[i] = unicodeFinal;
-                                        i++;
-                                    }
-                                }
-                            }
-                            if (input.Contains("0"))
-                            {
-                                if (MUSECAPageUpper.Contains(songBracketUpper))
-                                {
-                                    matchesMUSECA[i] = songShort;
-                                    i++;
-                                }
-                                else if (containsUnicode == true)
-                                {
-                                    if (MUSECAPageUpper.Contains(songBracketUnicodeUpper))
-                                    {
-                                        matchesMUSECA[i] = unicodeFinal;
-                                        i++;
-                                    }
-                                }
+                                goto theend;
                             }
                         }
+                        else if (line.Contains("TitleUnicode:")) // unicode title saved
+                        {
+                            var textUni = line.Replace("TitleUnicode:", "");
+                            var textUni2 = textUni;
+                            if (textUni.Contains("(TV Size)"))
+                            {
+                                textUni2 = textUni.Replace("(TV Size)", "");
+                            }
+                            result = textUni2.Trim();
+                            if (resultUni == "")
+                            {
+                                resultUni = "N/A";
+                            }
+                        }
+                        else if (!String.IsNullOrWhiteSpace(result) && !String.IsNullOrWhiteSpace(resultUni)) //title and unicode title filled, move on
+                        {
+                            goto search;
+                        }
+                        //no match, next line
                     }
-                    else
-                    {
-
-                    }
-
                 }
+                else if (file.Contains(".sm")) // stepmania
+                {
+                    result = string.Empty;
+                    var lines = File.ReadAllLines(path);
+                    foreach (var line in lines)
+                    {
+                        if (line.Contains("#TITLE:")) // title saved
+                        {
+                            var text = line.Replace("#TITLE:", "");
+                            result = text.Trim(';');
+                            if (matched.Contains(result))
+                            {
+                                goto theend;
+                            }
+                            goto search;
+                        }
+                    } // no match, move on
+                }
+                else if (file.Contains(".ini")) // clone hero
+                {
+
+                    result = string.Empty;
+                    var lines = File.ReadAllLines(path);
+                    foreach (var line in lines)
+                    {
+                        if (line.Contains("name")) // title saved
+                        {
+                            var text = line.Replace("name", "");
+                            var text2 = text.Replace("=", "");
+                            result = text2.Trim();
+                            if (matched.Contains(result))
+                            {
+                                goto theend;
+                            }
+                            goto search;
+                        }
+                    } // no match, move on
+                }
+            search:
+                string songBracket = ">" + result.ToUpper() + "<";
+                string songBracketUnicode = ">" + resultUni.ToUpper() + "<";
+                bool containsUnicode = songBracketUnicode.Contains(">N/A<");
+                matched[i] = result;
+                i++;
+                if (input.Contains("1"))
+                {
+                    if (IIDXPageUpper.Contains(songBracket) || IIDXPageUpper2.Contains(songBracket))
+                    {
+                        matchesIIDX[i] = result;
+                        i++;
+                    }
+                    else if (containsUnicode == true)
+                    {
+                        if (IIDXPageUpper.Contains(songBracketUnicode) || IIDXPageUpper2.Contains(songBracketUnicode))
+                        {
+                            matchesIIDX[i] = resultUni;
+                            i++;
+                        }
+                    }
+                }
+                if (input.Contains("2"))
+                {
+                    if (pmPageUpper.Contains(songBracket) || pmPageUpper2.Contains(songBracket))
+                    {
+                        matchesPM[i] = result;
+                        i++;
+                    }
+                    else if (containsUnicode == true)
+                    {
+                        if (pmPageUpper.Contains(songBracketUnicode) || pmPageUpper2.Contains(songBracketUnicode))
+                        {
+                            matchesPM[i] = resultUni;
+                            i++;
+                        }
+                    }
+                }
+                if (input.Contains("3"))
+                {
+                    if (DDRPageUpper.Contains(songBracket) || DDRPageUpper2.Contains(songBracket))
+                    {
+                        matchesDDR[i] = result;
+                        i++;
+                    }
+                    else if (containsUnicode == true)
+                    {
+                        if (DDRPageUpper.Contains(songBracketUnicode) || DDRPageUpper2.Contains(songBracketUnicode))
+                        {
+                            matchesDDR[i] = resultUni;
+                            i++;
+                        }
+                    }
+                }
+                if (input.Contains("4"))
+                {
+                    if (GDPageUpper.Contains(songBracket) || GDPageUpper2.Contains(songBracket) || (GDPageUpper3.Contains(songBracket)))
+                    {
+                        matchesGD[i] = result;
+                        i++;
+                    }
+                    else if (containsUnicode == true)
+                    {
+                        if (GDPageUpper.Contains(songBracketUnicode) || GDPageUpper2.Contains(songBracketUnicode) || (GDPageUpper3.Contains(songBracket)))
+                        {
+                            matchesGD[i] = resultUni;
+                            i++;
+                        }
+                    }
+                }
+                if (input.Contains("5"))
+                {
+                    if (jubeatPageUpper.Contains(songBracket) || jubeatPageUpper2.Contains(songBracket))
+                    {
+                        matchesjubeat[i] = result;
+                        i++;
+                    }
+                    else if (containsUnicode == true)
+                    {
+                        if (jubeatPageUpper.Contains(songBracketUnicode) || jubeatPageUpper2.Contains(songBracketUnicode))
+                        {
+                            matchesjubeat[i] = resultUni;
+                            i++;
+                        }
+                    }
+                }
+                if (input.Contains("6"))
+                {
+                    if (reflectPageUpper.Contains(songBracket) || reflectPageUpper2.Contains(songBracket))
+                    {
+                        matchesreflect[i] = result;
+                        i++;
+                    }
+                    else if (containsUnicode == true)
+                    {
+                        if (reflectPageUpper.Contains(songBracketUnicode) || reflectPageUpper2.Contains(songBracketUnicode))
+                        {
+                            matchesreflect[i] = resultUni;
+                            i++;
+                        }
+                    }
+                }
+                if (input.Contains("7"))
+                {
+                    if (SDVXPageUpper.Contains(songBracket) || SDVXPageUpper2.Contains(songBracket))
+                    {
+                        matchesSDVX[i] = result;
+                        i++;
+                    }
+                    else if (containsUnicode == true)
+                    {
+                        if (SDVXPageUpper.Contains(songBracketUnicode) || SDVXPageUpper2.Contains(songBracketUnicode))
+                        {
+                            matchesSDVX[i] = resultUni;
+                            i++;
+                        }
+                    }
+                }
+                if (input.Contains("8"))
+                {
+                    if (nostalgiaPageUpper.Contains(songBracket) || nostalgiaPageUpper2.Contains(songBracket))
+                    {
+                        matchesnostalgia[i] = result;
+                        i++;
+                    }
+                    else if (containsUnicode == true)
+                    {
+                        if (nostalgiaPageUpper.Contains(songBracketUnicode) || nostalgiaPageUpper2.Contains(songBracketUnicode))
+                        {
+                            matchesnostalgia[i] = resultUni;
+                            i++;
+                        }
+                    }
+                }
+                if (input.Contains("9"))
+                {
+                    if (DRSDPageUpper.Contains(songBracket))
+                    {
+                        matchesDRSD[i] = result;
+                        i++;
+                    }
+                    else if (containsUnicode == true)
+                    {
+                        if (DRSDPageUpper.Contains(songBracketUnicode))
+                        {
+                            matchesDRSD[i] = resultUni;
+                            i++;
+                        }
+                    }
+                }
+                if (input.Contains("0"))
+                {
+                    if (MUSECAPageUpper.Contains(songBracket))
+                    {
+                        matchesMUSECA[i] = result;
+                        i++;
+                    }
+                    else if (containsUnicode == true)
+                    {
+                        if (MUSECAPageUpper.Contains(songBracketUnicode))
+                        {
+                            matchesMUSECA[i] = resultUni;
+                            i++;
+                        }
+                    }
+                }
+            theend:
+                Console.Write("");
             }
             Console.WriteLine("\n Here is every osu! song you have that matches the name of a song from the Bemani wiki. \n This might not necessarily mean that the songs are the same, as they might share the same name but be different songs.");
-            var distinctmatchesIIDX = matchesIIDX.Distinct().ToArray();
-            var distinctmatchesPM = matchesPM.Distinct().ToArray();
-            var distinctmatchesDDR = matchesDDR.Distinct().ToArray();
-            var distinctmatchesGD = matchesGD.Distinct().ToArray();
-            var distinctmatchesjubeat = matchesjubeat.Distinct().ToArray();
-            var distinctmatchesreflect = matchesreflect.Distinct().ToArray();
-            var distinctmatchesSDVX = matchesSDVX.Distinct().ToArray();
-            var distinctmatchesnostalgia = matchesnostalgia.Distinct().ToArray();
-            var distinctmatchesDRSD = matchesDRSD.Distinct().ToArray();
-            var distinctmatchesMUSECA = matchesMUSECA.Distinct().ToArray();
+            var distinctmatchesIIDX = matchesIIDX.Distinct().Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            var distinctmatchesPM = matchesPM.Distinct().Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            var distinctmatchesDDR = matchesDDR.Distinct().Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            var distinctmatchesGD = matchesGD.Distinct().Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            var distinctmatchesjubeat = matchesjubeat.Distinct().Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            var distinctmatchesreflect = matchesreflect.Distinct().Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            var distinctmatchesSDVX = matchesSDVX.Distinct().Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            var distinctmatchesnostalgia = matchesnostalgia.Distinct().Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            var distinctmatchesDRSD = matchesDRSD.Distinct().Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            var distinctmatchesMUSECA = matchesMUSECA.Distinct().Where(x => !string.IsNullOrEmpty(x)).ToArray();
             string applicationPath = Path.GetDirectoryName(Application.ExecutablePath);
             string textFilePath = Path.Combine(applicationPath, "matches.txt");
             if (filebool == true)
@@ -764,24 +711,48 @@ namespace rhythm_games_to_bemani
                 }
                 catch (IOException)
                 {
-                    File.Delete(textFilePath);
-                    try
+                    Console.WriteLine("There seems to already be a matches.txt file. Should it be deleted? (y) (n)");
+                    Console.Write("");
+                    string deleting = Console.ReadLine();
+                    if (deleting.Length <= 0)
                     {
-                        File.Create("matches.txt").Dispose();
-                    }
-                    catch (UnauthorizedAccessException)
-                    {
-                        Console.WriteLine(" I don't have permission to create a file! Move this executable somewhere else.");
+                        Console.WriteLine(" Error: This is not a yes or no answer. The file will not be deleted.");
                         filebool = false;
                     }
-                    catch (PathTooLongException)
+                    if (deleting.Contains("y") && deleting.Contains("n"))
                     {
-                        Console.WriteLine(" I can't create a file here. Move this executable somewhere with a shorter directory name.");
+                        Console.WriteLine(" You cannot select both yes and no. The file will not be deleted.");
                         filebool = false;
                     }
-                    catch
+                    if (deleting.Contains("y"))
                     {
-                        Console.WriteLine(" Error creating file.");
+                        File.Delete(textFilePath);
+                        try
+                        {
+                            File.Create("matches.txt").Dispose();
+                        }
+                        catch (UnauthorizedAccessException)
+                        {
+                            Console.WriteLine(" I don't have permission to create a file! Move this executable somewhere else.");
+                            filebool = false;
+                        }
+                        catch (PathTooLongException)
+                        {
+                            Console.WriteLine(" I can't create a file here. Move this executable somewhere with a shorter directory name.");
+                            filebool = false;
+                        }
+                        catch
+                        {
+                            Console.WriteLine(" Error creating file.");
+                        }
+                    }
+                    else if (deleting.Contains("n"))
+                    {
+                        filebool = false;
+                    }
+                    else
+                    {
+                        filebool = false;
                     }
                 }
                 catch
@@ -795,7 +766,7 @@ namespace rhythm_games_to_bemani
                 File.AppendAllText(textFilePath, "beatmania IIDX:" + Environment.NewLine);
                 foreach (var match in distinctmatchesIIDX)
                 {
-                    if (match == null)
+                    if (match == null || String.IsNullOrWhiteSpace(match) == true)
                     {
 
                     }
@@ -1026,8 +997,6 @@ namespace rhythm_games_to_bemani
             }
             Console.WriteLine(" Press Enter when you're finished to close this window.");
             Console.ReadLine();
-
         }
-
     }
 }
