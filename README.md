@@ -1,3 +1,6 @@
+# DEPRECATED
+See [Rhythm Games Converter](https://github.com/Suprnova123/rhythm-games-converter) for up-to-date version.
+
 # Rhythm Games to BEMANI converter
 Console based application that will search through your rhythm game song folders to find songs that also appear in popular BEMANI games. It uses the user provided songs directory and compares it to [BEMANIWiki](http://bemaniwiki.com/).
 
